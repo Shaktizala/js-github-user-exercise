@@ -17,43 +17,63 @@ let validUserCount = 0
 let invalidUserCount = 0
 let isExecuted = false
 
-async function getUsers() {
+// function getUsers() {
+//   ShowAwaiting()
+//   console.time('Exectuion Time:')
+//   const requests = users.map((name) =>
+//     fetch(`https://api.github.com/users/${name}`,{
+//       headers : {
+//         'authorization' : 'token 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'
+//       }
+//     })
+//     );
+
+//   try {
+//     Promise.all(requests)
+//     .then(responses => responses.forEach(
+//       response => {
+//         if(response.status === 200){
+//           validUserCount++;
+//           response.json().then((data)=> userDetails.push(data))
+//         }else{
+//           invalidUserCount++;
+//         }
+//         isExecuted = true
+//       }
+//     ));
+//   } catch (err) {
+//     console.log(err)
+//   }
+//   console.timeEnd('Exectuion Time:')
+// }
+  
+// getUsers(users)
+
+function getUserDetails(){
   ShowAwaiting()
   console.time('Exectuion Time:')
-  const requests = users.map((name) =>
-    fetch(`https://api.github.com/users/${name}`,{
-      headers : {
-        'authorization' : 'token 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'
-      }
-    })
-    );
 
-  try {
-    Promise.all(requests)
-    .then(responses => responses.forEach(
-      response => {
-        if(response.status === 200){
-          validUserCount++;
-          response.json().then((data)=> userDetails.push(data))
-        }else{
-          invalidUserCount++;
-        }
-        isExecuted = true
+  for(userName in users){
+      detail = fetch(`https://api.github.com/users/${users[userName]}`,{
+      headers : {
+        'authorization' : 'token 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'
       }
-    ));
-  } catch (err) {
-    console.log(err)
+    }).then((data)=>data.json())
+      .then((res) => {userDetails.push(res)
+      if (res.message=="Not Found"){
+            invalidUserCount++;
+        }
+      })
   }
-  console.timeEnd('Exectuion Time:')
 }
-  
-getUsers(users)
+getUserDetails()
 var intId = setInterval(function(){
-  if(isExecuted == true) {
+  if(userDetails.length === users.length) {
     clearInterval(intId)
     clearInterval(twirlTimer)
     console.log(userDetails)
-    console.log('valid users:', validUserCount);
+    console.log('valid users:', users.length-invalidUserCount);
     console.log('invalid users:', invalidUserCount);
+    console.timeEnd('Exectuion Time:')
   }
 },25)
